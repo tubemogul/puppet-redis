@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.2.5](https://github.com/tubemogul/puppet-redis/tree/1.2.5) (2017-04-13)
+[Full Changelog](https://github.com/tubemogul/puppet-redis/compare/1.2.4...1.2.5)
+
+**Fixed issues:**
+
+- Parameters not valid for older Redis in config [\#111](https://github.com/arioch/puppet-redis/issues/111)
+- Ownership problem with Ubuntu redis-server [\#150](https://github.com/arioch/puppet-redis/issues/150)
+
 ## [1.2.4](https://github.com/arioch/puppet-redis/tree/1.2.4) (2016-12-05)
 [Full Changelog](https://github.com/arioch/puppet-redis/compare/1.2.3...1.2.4)
 
