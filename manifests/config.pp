@@ -88,8 +88,9 @@ class redis::config {
       mode   => $::redis::config_dir_mode;
 
     $::redis::config_file_orig:
-      ensure  => present,
-      content => template($::redis::conf_template);
+      ensure  => file,
+      owner  => $::redis::config_owner,
+      group  => $::redis::config_group;
 
     $::redis::log_dir:
       ensure => directory,
@@ -104,18 +105,23 @@ class redis::config {
       owner  => $::redis::service_user;
   }
 
-  exec {
-    "cp -p ${::redis::config_file_orig} ${::redis::config_file}":
-      path        => '/usr/bin:/bin',
-      subscribe   => File[$::redis::config_file_orig],
-      refreshonly => true;
-  } ~> Service <| title == $::redis::service_name |>
+  if (($::redis::redis_version_real) and (versioncmp('2.8.24', $::redis::redis_version_real) < 0)) {
+    File[$::redis::config_file_orig] { content => template($::redis::conf_template) }
+  } else {
+    File[$::redis::config_file_orig] { content => template('redis/redis.conf.2.x.erb') }
+  }
+
+  exec { "cp -p ${::redis::config_file_orig} ${::redis::config_file}":
+    path        => '/usr/bin:/bin',
+    subscribe   => File[$::redis::config_file_orig],
+    refreshonly => true;
+  }
 
   # Adjust /etc/default/redis-server on Debian systems
   case $::osfamily {
     'Debian': {
       file { '/etc/default/redis-server':
-        ensure => present,
+        ensure => file,
         group  => $::redis::config_group,
         mode   => $::redis::config_file_mode,
         owner  => $::redis::config_owner,
